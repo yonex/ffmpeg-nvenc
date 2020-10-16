@@ -1,13 +1,13 @@
-FROM nvidia/cuda:10.0-devel-ubuntu18.04
+FROM nvidia/cuda:11.1-devel-ubuntu18.04
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV NVIDIA_VISIBLE_DEVICES all
 ENV NVIDIA_DRIVER_CAPABILITIES video,compute,utility
 
-ARG NASM_VER="2.14"
+ARG NASM_VER="2.15"
 ARG YASM_VER="1.3.0"
 ARG LAME_VER="3.100"
-ARG FFMPEG_VER="4.1.1"
+ARG FFMPEG_VER="4.3.1"
 
 # Install required Packages
 
@@ -66,7 +66,7 @@ RUN set -xe && \
 
 WORKDIR /usr/local/ffmpeg_sources
 RUN set -xe && \
-    hg clone https://bitbucket.org/multicoreware/x265 \
+    git clone --depth=1 https://bitbucket.org/multicoreware/x265_git \
         /usr/local/ffmpeg_sources/x265 && \
     cd /usr/local/ffmpeg_sources/x265/build/linux && \
     cmake -G "Unix Makefiles" -DENABLE_SHARED=off ../../source && \
@@ -127,7 +127,7 @@ RUN set -xe && \
 WORKDIR /usr/local/ffmpeg_sources
 RUN set -xe && \
     git -C nv-codec-headers pull 2> /dev/null || \
-        git clone https://github.com/FFmpeg/nv-codec-headers && \
+        git clone --branch=sdk/10.0 https://github.com/FFmpeg/nv-codec-headers && \
     cd nv-codec-headers && \
     make -j$(nproc) && \
     make install
@@ -153,7 +153,6 @@ RUN set -xe && \
 	--enable-libvorbis \
 	--enable-libvpx \
 	--enable-libx264 \
-	--enable-libx265 \
 	--enable-static \
 	--enable-cuda \
 	--enable-cuvid \
